@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [[ -z $1 ]]
+then
+        echo "Ducon, le nom du fichier a créer"
+elif [[ $1 = "help" ]]
+then
+        echo "+-_-_-_-_-_-_-_-_-_-_-_-_-_-_+"
+        echo "| Utilisation du script genh |"
+        echo "+-_-_-_-_-_-_-_-_-_-_-_-_-_-_+"
+        echo "Il faut se placer dans le répertoire contenant les fichiers .c puis :"
+        echo -e "\ngenh nom_du_fichier.h\n"
+        echo -e "/!\\ N'oubliez pas de vérifier l'alignement des fonctions\n"
+        echo -e "Si le fichier existe déjà, il sera renommé en nom_de_fichier.h.back\n"
+else
+        FILES=$(find . -name "*.c" | grep -v "libft\|\~")
+        HFILE=$1
+        if [ -f $HFILE ]
+        then
+                mv $HFILE $HFILE.back
+        fi
+        touch $HFILE
+        ~/scripts/header_42 $HFILE "/"
+        DEFINE=$(echo $HFILE | tr "." "_" | tr a-z A-Z)
+        echo -e "\n#ifndef "$DEFINE"\n# define "$DEFINE"\n" >> $HFILE
+        if [[ $2 = "lib" ]]
+        then
+                echo -e "#include <string.h>\n" >> $HFILE
+                echo -e "typedef struct\t\ts_list" >> $HFILE
+                echo -e "{" >> $HFILE
+                echo -e "\tvoid\t\t\t*content;" >> $HFILE
+                echo -e "\tsize_t\t\t\tcontent_size;" >> $HFILE
+                echo -e "\tstruct s_list\t*next;" >> $HFILE
+                echo -e "}\t\t\t\t\tt_list;\n" >> $HFILE
+        fi
+        for FILE in $FILES
+        do
+                        cat $FILE | grep "(" | grep -v ";\|\twhile \|\tif \|sizeof\|static \|->\|=\|\tmain(\|\telse" | sed 's/.*/&;/' >> $HFILE
+        done
+        echo -e "\n#endif /* !"$DEFINE" */" >> $HFILE
+fi

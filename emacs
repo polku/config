@@ -50,7 +50,6 @@
 (global-set-key (kbd "C-o") 'other-window)
 (global-set-key (kbd "C-f") 'forward-word)
 (global-set-key (kbd "C-d") 'scroll-down)
-;(global-set-key (kbd "M-i") 'indent-region) ; macro selection doc
 (global-set-key (kbd "C-x C-n") 'global-whitespace-mode)
 (global-set-key (kbd "C-c C-c") 'comment-region)
 (global-set-key (kbd "C-c C-u") 'uncomment-region)
@@ -58,9 +57,10 @@
 (global-set-key (kbd "<f6>") 'calendar)
 (global-set-key (kbd "<f7>") 'comment-region)
 (global-set-key (kbd "<f8>") 'uncomment-region)
-;(fset 'indent-file  "\C-[xmark-whole-buffer\C-m\C-[xindent-region\C-m")
 (defun indent-file() "Indent the file" (interactive) (indent-region (point-min) (point-max) nil))
 (global-set-key (kbd "<f10>") 'indent-file)
+(global-set-key (kbd "<f11>") 'call-last-kbd-macro)
 (global-set-key (kbd "<f9>") 'ibuffer)
-(ido-mode t) ; liste fich pour C-x C-f
+(ido-mode t) ; rech nom fich
+(add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode)) ; open .m file with octave-mode
 ;*******************************************************************************;
