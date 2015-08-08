@@ -1,0 +1,13 @@
+
+[core]
+	excludesfile = ~/.gitignore_global
+	editor = /usr/bin/emacs
+[user]
+	name = jmaurice
+	email = jmaurice@student.42.fr
+[push]
+	default = matching
+[alias]
+	ignore = update-index --assume-unchanged
+	unignore = update-index --no-assume-unchanged
+	ignored = !git ls-files -v | grep "^[[:lower:]]"
