@@ -2,11 +2,11 @@
 (setq config_files "/usr/share/emacs/site-lisp/")
 (setq load-path (append (list nil config_files) load-path))
 
-(load "list.el")
-(load "string.el")
-(load "comments.el")
-(load "header.el")
-(load "php-mode.el")
+;(load "list.el")
+;(load "string.el")
+;(load "comments.el")
+;(load "header.el")
+;(load "php-mode.el")
 
 ;(require 'template)
 ;(require 'ess-site)
@@ -37,11 +37,14 @@
 ;(c-set-offset 'label '+)
 ;(c-set-offset 'defun-block-intro '++) ; av
 
+; Mouse
+(require 'mouse)
+(require 'xt-mouse)
+(xterm-mouse-mode t)
+
 ; Global options
 (global-set-key (kbd "DEL") 'backward-delete-char)
 (setq-default c-backspace-function 'backward-delete-char)
-(require 'mouse)
-(xterm-mouse-mode t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 (setq make-backup-files nil)
@@ -91,4 +94,54 @@
 (setq auto-insert-query nil)
 (define-auto-insert "\.py" "python.py")
 
+;; Configure flymake for Python
+(when (load "flymake" t)
+  (defun flymake-pylint-init ()
+	(let* ((temp-file (flymake-init-create-temp-buffer-copy
+					   'flymake-create-temp-inplace))
+		   (local-file (file-relative-name
+						temp-file
+						(file-name-directory buffer-file-name))))
+	  (list "epylint" (list local-file))))
+  (add-to-list 'flymake-allowed-file-name-masks
+			   '("\\.py\\'" flymake-pylint-init)))
+
+;; Set as a minor mode for Python
+(add-hook 'python-mode-hook '(lambda () (flymake-mode)))
+
+;; Configure to wait a bit longer after edits before starting
+(setq-default flymake-no-changes-timeout '3)
+
+;; Keymaps to navigate to the errors
+(add-hook 'python-mode-hook '(lambda () (define-key python-mode-map "\C-cn" 'flymake-goto-next-error)))
+(add-hook 'python-mode-hook '(lambda () (define-key python-mode-map "\C-cp" 'flymake-goto-prev-error)))
+
+;; To avoid having to mouse hover for the error message, these functions make flymake error messages
+;; appear in the minibuffer
+(defun show-fly-err-at-point ()
+  "If the cursor is sitting on a flymake error, display the message in the minibuffer"
+  (require 'cl)
+  (interactive)
+  (let ((line-no (line-number-at-pos)))
+	(dolist (elem flymake-err-info)
+	  (if (eq (car elem) line-no)
+		  (let ((err (car (second elem))))
+			(message "%s" (flymake-ler-text err)))))))
+
+(add-hook 'post-command-hook 'show-fly-err-at-point)
+
 ;*******************************************************************************;
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(custom-enabled-themes (quote (wombat))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
