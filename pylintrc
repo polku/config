@@ -6,6 +6,13 @@
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
 #init-hook=
+# To have pylint in virtualenvs :
+# - copy this file in the venv dir
+# - uncomment this line
+# - add this to the activate script :
+#      PYLINTRC="$VIRTUAL_ENV/.pylintrc"
+#      export PYLINTRC
+# init-hook="sys.path.append(os.path.join(os.environ['VIRTUAL_ENV'], 'lib', 'python3.5', 'site-packages'))"
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
