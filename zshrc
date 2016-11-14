@@ -23,9 +23,11 @@ alias gg='llvm-gcc -Wall -Wextra -Werror'
 alias gcc='llvm-gcc -g -Wall -Wextra'
 alias ll='ls -lhG'
 alias ruby='/nfs/zfs-student-2/users/2013/jmaurice/ruby-2.1.0/bin/ruby'
-alias android='./adt-bundle-mac-x86_64-20140321/eclipse/Eclipse.app/Contents/MacOS/eclipse'
-alias R='~/.brew/bin/R'
 alias e='emacs -nw'
+
+mkcd () {
+    mkdir $1 && cd $1
+}
 
 export PATH=$PATH:~/bin/
 export PATH=$PATH:~/.brew/bin/
