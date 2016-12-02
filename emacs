@@ -1,29 +1,37 @@
 ; Load general features files
 (setq config_files "/usr/share/emacs/site-lisp/")
 (setq load-path (append (list nil config_files) load-path))
+(add-to-list 'load-path "~/.emacs.d/elpa/")
 
 ;(load "list.el")
 ;(load "string.el")
 ;(load "comments.el")
 ;(load "header.el")
-;(load "php-mode.el")
 
 ;(require 'template)
 ;(require 'ess-site)
 ;(template-initialize)
+
+(require 'package)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+		            	 ("marmalade" . "https://marmalade-repo.org/packages/")
+			             ("melpa" . "https://melpa.org/packages/")))
 
 ; Set default emacs configuration
 (set-language-environment "UTF-8")
 (setq-default font-lock-global-modes t)
 (setq-default line-number-mode t)
 (setq-default column-number-mode t)
-(setq-default tab-width 4)
+
 
 ; indents
 ;(global-set-key (kbd "TAB") 'self-insert-command)
-(setq-default indent-tabs-mode t)
-(setq-default tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
-                             64 68 72 76 80 84 88 92 96 100 104 108 112 116 120))
+;(setq-default indent-tabs-mode t)
+;(setq-default tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
+;                             64 68 72 76 80 84 88 92 96 100 104 108 112 116 120))
+(setq-default indent-tabs-mode nil
+              tab-width 4) ; C-q if a tab is really necessary
+              
 (add-hook 'c-mode-hook
    (lambda () (define-key c-mode-map (kbd "TAB") 'self-insert-command)))
 (add-hook 'c++-mode-hook
