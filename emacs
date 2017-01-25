@@ -1,75 +1,66 @@
-; Load general features files
+;; Load general features files
 (setq config_files "/usr/share/emacs/site-lisp/")
 (setq load-path (append (list nil config_files) load-path))
 (add-to-list 'load-path "~/.emacs.d/elpa/")
 
-;(load "list.el")
-;(load "string.el")
-;(load "comments.el")
-;(load "header.el")
-
-;(require 'template)
-;(require 'ess-site)
-;(template-initialize)
-
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                    	 ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 
-; Set default emacs configuration
+
+;; Set default emacs configuration
 (set-language-environment "UTF-8")
 (setq-default font-lock-global-modes t)
 (setq-default line-number-mode t)
 (setq-default column-number-mode t)
-
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 
 ; indents
 ;(global-set-key (kbd "TAB") 'self-insert-command)
 ;(setq-default indent-tabs-mode t)
 ;(setq-default tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
 ;                             64 68 72 76 80 84 88 92 96 100 104 108 112 116 120))
+;(add-hook 'c-mode-hook
+;   (lambda () (define-key c-mode-map (kbd "TAB") 'self-insert-command)))
+;(add-hook 'c++-mode-hook
+;   (lambda () (define-key c++-mode-map (kbd "TAB") 'self-insert-command)))
+
 (setq-default indent-tabs-mode nil
-              tab-width 4) ; C-q if a tab is really necessary
-              
-(add-hook 'c-mode-hook
-   (lambda () (define-key c-mode-map (kbd "TAB") 'self-insert-command)))
-(add-hook 'c++-mode-hook
-   (lambda () (define-key c++-mode-map (kbd "TAB") 'self-insert-command)))
+              tab-width 4) ; C-q <TAB> if a tab is really necessary
+
 (setq-default c-basic-offset 4)
 (setq-default c-default-style "linux")
 
-; Specific options indentation
+;; Specific options indentation
 (c-set-offset 'inline-open 0)
 (c-set-offset 'case-label '+)
-;(c-set-offset 'label '+)
-;(c-set-offset 'defun-block-intro '++) ; av
 
-; Mouse
+;; Mouse
 (require 'mouse)
 (require 'xt-mouse)
 (xterm-mouse-mode t)
 
-; Global options
+;; Global options
 (global-set-key (kbd "DEL") 'backward-delete-char)
 (setq-default c-backspace-function 'backward-delete-char)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq ring-bell-function 'ignore)
 (setq make-backup-files nil)
-(setq auto-save-interval 120)
+(setq auto-save-interval 30)
 (setq show-trailing-whitespace t)
 (setq-default show-trailing-whitespace t)
 (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 (display-time-mode 1)
 (ido-mode t) ; rech nom fich
-(add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode)) ; open .m file with octave-mode
-(add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode)) ; open .tpp file with c++-mode
-(add-to-list 'auto-mode-alist '("\\.vert\\'" . c-mode)) ; open glsl shader with c-mode
-(add-to-list 'auto-mode-alist '("\\.frag\\'" . c-mode)) ; open glsl shader with c-mode
 (put 'upcase-region 'disabled nil) ;; C-x C-u active
+(global-linum-mode 1)
+(show-paren-mode 1) ; show matching parenthese
 ;;(global-auto-revert-mode t) ;; reload files when changed
 
-; Global bindings
+;; Global bindings
+(defun untab-file() "Untabify the file" (interactive) (untabify (point-min) (point-max) nil))
+(defun indent-file() "Indent the file" (interactive) (indent-region (point-min) (point-max) nil))
 (global-set-key (kbd "C-o") 'other-window)
 (global-set-key (kbd "C-f") 'forward-word)
 (global-set-key (kbd "C-d") 'scroll-down)
@@ -77,48 +68,84 @@
 (global-set-key (kbd "C-c C-c") 'comment-region)
 (global-set-key (kbd "C-c C-u") 'uncomment-region)
 (global-set-key (kbd "<f5>") 'calculator)
-(global-set-key (kbd "<f6>") 'calendar)
+(global-set-key (kbd "<f6>") 'untab-file)
 (global-set-key (kbd "<f7>") 'comment-region)
 (global-set-key (kbd "<f8>") 'uncomment-region)
 (global-set-key (kbd "<f9>") 'ibuffer)
-(defun indent-file() "Indent the file" (interactive) (indent-region (point-min) (point-max) nil))
 (global-set-key (kbd "<f10>") 'indent-file)
 (global-set-key (kbd "<f11>") 'call-last-kbd-macro)
 
-; Mode specific bindings
+;; Custom functions
+(defun toggle-comments-region (start end)
+  "Toggle comments (on/off) for each line in the region"
+  (interactive "r")
+  (goto-char start)
+  (while (< (point) end)
+    (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+    (forward-line 1)))
+
+(defun toggle-comment-line ()
+  "comment or uncomment current line"
+  (interactive)
+  (comment-or-uncomment-region (line-beginning-position) (line-end-position)))
+
+
+;; Mode specific bindings
 (fset 'cout
    "std::cout << \"\" << std:endl;\C-[OD\C-[OD\C-[OD\C-[OD\C-[OD:\C-[OC\C-[OC\C-[OC\C-[OC\C-[OC\C-m")
 (add-hook 'c++-mode-hook
-	(lambda ()
-		(define-key c++-mode-map (kbd "<f9>") 'cout)))
+    (lambda ()
+        (define-key c++-mode-map (kbd "<f9>") 'cout)))
 (add-hook 'python-mode-hook
           (lambda ()
-			(setq indent-tabs-mode nil
-            		tab-width 4)))
+            (setq indent-tabs-mode nil
+                    tab-width 4)))
 
-; Auto-insert-mode (cf templates)
+;; Auto-insert-mode (cf templates)
 (auto-insert-mode)
 (setq auto-insert-directory "~/.mytemplates/")
 (setq auto-insert-query nil)
 (define-auto-insert "\.py" "python.py")
+(define-auto-insert "\.html" "html.html")
+(define-auto-insert "\.df" "docker.df")
+(define-auto-insert "Dockerfile" "docker.df")
+
+;; specific modes
+(add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode)) ; open .m file with octave-mode
+(add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode)) ; open .tpp file with c++-mode
+(add-to-list 'auto-mode-alist '("\\.vert\\'" . c-mode)) ; open glsl shader with c-mode
+(add-to-list 'auto-mode-alist '("\\.frag\\'" . c-mode)) ; open glsl shader with c-mode
+(add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode)) ; handle js in html
+
+
+;; dockerfile mode
+(add-to-list 'load-path "~/.local/share/emacs/dockerfile-mode/")
+(require 'dockerfile-mode)
+(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+(add-to-list 'auto-mode-alist '("\\.df\\'" . dockerfile-mode))
+
 
 ;; Configure flymake for Python
+;; to deactivate flymake for a file, set this as the first line:
+;; -*- mode: Python; eval: (flymake-mode 0) -*-
 (when (load "flymake" t)
   (defun flymake-pylint-init ()
-	(let* ((temp-file (flymake-init-create-temp-buffer-copy
-					   'flymake-create-temp-inplace))
-		   (local-file (file-relative-name
-						temp-file
-						(file-name-directory buffer-file-name))))
-	  (list "epylint" (list local-file))))
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "epylint3" (list local-file))))
+
   (add-to-list 'flymake-allowed-file-name-masks
-			   '("\\.py\\'" flymake-pylint-init)))
+               '("\\.py\\'" flymake-pylint-init)))
 
 ;; Set as a minor mode for Python
 (add-hook 'python-mode-hook '(lambda () (flymake-mode)))
 
 ;; Configure to wait a bit longer after edits before starting
-(setq-default flymake-no-changes-timeout '3)
+(setq-default flymake-no-changes-timeout '1)
 
 ;; Keymaps to navigate to the errors
 (add-hook 'python-mode-hook '(lambda () (define-key python-mode-map "\C-cn" 'flymake-goto-next-error)))
@@ -131,12 +158,13 @@
   (require 'cl)
   (interactive)
   (let ((line-no (line-number-at-pos)))
-	(dolist (elem flymake-err-info)
-	  (if (eq (car elem) line-no)
-		  (let ((err (car (second elem))))
-			(message "%s" (flymake-ler-text err)))))))
+    (dolist (elem flymake-err-info)
+      (if (eq (car elem) line-no)
+          (let ((err (car (second elem))))
+            (message "%s" (flymake-ler-text err)))))))
 
 (add-hook 'post-command-hook 'show-fly-err-at-point)
+
 
 ;*******************************************************************************;
 (custom-set-variables
