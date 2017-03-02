@@ -75,6 +75,19 @@
 (global-set-key (kbd "<f10>") 'indent-file)
 (global-set-key (kbd "<f11>") 'call-last-kbd-macro)
 
+;; auto-complete for all prog-modes
+(add-hook 'prog-mode-hook #'auto-complete-mode)
+
+;; Fuzzy matching search
+(global-set-key (kbd "C-M-s") 'flx-isearch-forward)
+(global-set-key (kbd "C-M-r") 'flx-isearch-backward)
+
+;; Copy pasta, gui only
+(if window-system ((load "simpleclip-1.0.0/simpleclip.el")
+                   (simpleclip-mode 1)
+                   (setq x-select-enable-primary t)
+                   (setq x-select-enable-clipboard t)))
+                   
 ;; Custom functions
 (defun toggle-comments-region (start end)
   "Toggle comments (on/off) for each line in the region"
@@ -90,7 +103,7 @@
   (comment-or-uncomment-region (line-beginning-position) (line-end-position)))
 
 
-;; Mode specific bindings
+;; Mode specific bindings and options
 (fset 'cout
    "std::cout << \"\" << std:endl;\C-[OD\C-[OD\C-[OD\C-[OD\C-[OD:\C-[OC\C-[OC\C-[OC\C-[OC\C-[OC\C-m")
 (add-hook 'c++-mode-hook
@@ -100,6 +113,12 @@
           (lambda ()
             (setq indent-tabs-mode nil
                     tab-width 4)))
+(add-hook 'web-mode-hook
+          (lambda ()
+            (setq web-mode-markup-indent-offset 2)
+            (define-key web-mode-map (kbd "C-n") 'web-mode-tag-match)))
+
+(setq-default ediff-forward-word-function 'forward-char)
 
 ;; Auto-insert-mode (cf templates)
 (auto-insert-mode)
