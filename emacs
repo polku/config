@@ -2,6 +2,9 @@
 (setq config_files "/usr/share/emacs/site-lisp/")
 (setq load-path (append (list nil config_files) load-path))
 (add-to-list 'load-path "~/.emacs.d/elpa/")
+(let ((default-directory  "~/.emacs.d/elpa/"))
+  (normal-top-level-add-subdirs-to-load-path))
+
 
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -87,7 +90,11 @@
                    (simpleclip-mode 1)
                    (setq x-select-enable-primary t)
                    (setq x-select-enable-clipboard t)))
-                   
+
+;; copy-paste in term
+(require 'bracketed-paste)
+(bracketed-paste-enable)
+                  
 ;; Custom functions
 (defun toggle-comments-region (start end)
   "Toggle comments (on/off) for each line in the region"
