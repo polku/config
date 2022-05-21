@@ -1,0 +1,13 @@
+Shell
+
+lsd (ls)
+mosh (ssh)
+bat (cat)
+fd (find)
+tldr / cheat (man)
+plocate (locate)
+fzf (fuzzy finder)
+lazydocker
+eradman/entr (fiel change events)
+nvbn/thefuck
+tstack/lnav
