@@ -1,0 +1,15 @@
+#!/bin/bash
+
+RED='\033[1;31m'
+NC='\033[0m'
+
+
+files=$(git diff --cached --name-only)
+
+for val in ${files[@]}; do
+   if grep -Fxq $val .gitlab/ci/alert_forks/sobilling.watched
+   then
+       echo -e "${RED}!!!!!!!!!!! So Billing !!!!!!!!!!!!${NC}"
+       exit 0
+   fi
+done
